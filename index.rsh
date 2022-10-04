@@ -1,5 +1,3 @@
-// automation done - timeout done - loop done - interaction done
-// working on web ui
 'reach 0.1';
 
 const [ isFingers, ZERO, ONE, TWO, THREE, FOUR, FIVE ] = makeEnum(6);
@@ -53,13 +51,11 @@ const Player = {
 
 export const main = Reach.App(() => {
   const Alice = Participant('Alice', {
-    // Specify Alice's interact interface here
     ...Player,
     wager: UInt,
     deadline: UInt
   });
   const Bob = Participant('Bob', {
-    // Specify Bob's interact interface here
     ...Player,
     acceptWager: Fun([UInt], Null),
   });
@@ -71,7 +67,6 @@ export const main = Reach.App(() => {
     });
   };
 
-  // The first one to publish deploys the contract
   Alice.only(() => {
     const amount = declassify(interact.wager);
     const deadline = declassify(interact.deadline);
@@ -95,7 +90,6 @@ export const main = Reach.App(() => {
     Alice.only(() => {
       const _fingersA = interact.getFingers();
       const _guessA = interact.getGuess(_fingersA);
-      //interact.log(_fingersA);
       const [ _commitAlice, _saltAlice ] = makeCommitment(interact, _fingersA);
       const commitAlice = declassify(_commitAlice);
       const [_guessCommitA, _guessSaltA] = makeCommitment(interact, _guessA);
@@ -118,7 +112,6 @@ export const main = Reach.App(() => {
       const fingersB = declassify(_fingersB);
       const guessB = declassify(_guessB);
     });
-    // The second one to publish always attaches
     
     Bob.publish(fingersB)
         .timeout(relativeTime(deadline), () => closeTo(Alice, informTimeout));
@@ -126,7 +119,6 @@ export const main = Reach.App(() => {
     Bob.publish(guessB)
       .timeout(relativeTime(deadline), () => closeTo(Alice, informTimeout));
       commit();
-    
 
     Alice.only(() => {
       const [saltAlice, fingersA] = declassify([_saltAlice, _fingersA]); 
@@ -154,7 +146,6 @@ export const main = Reach.App(() => {
     continue;
   }
 
-  // write your program here
   assert(outcome == A_WINS || outcome == B_WINS);
 
   transfer(2*amount).to(outcome == A_WINS ? Alice : Bob);
